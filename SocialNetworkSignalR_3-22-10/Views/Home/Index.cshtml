@@ -2,7 +2,29 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row">
+    <div class="col-md-11">
+    </div>
+    <div class="col-md-1">
+        <a href="/account/logout" class="btn btn-outline-primary">Log Out</a>
+    </div>
 </div>
+<div id="alert" class="alert alert-success" role="alert">
+</div>
+
+<div>
+    <h2>Welcome @ViewBag.User.UserName</h2>
+    <img src="images/@ViewBag.User.Image" style="width:50px;height:50px;border-radius:50%;" />
+</div>
+
+
+<div class="row">
+    <div id="allUsers" class="col-md-4" style="display:flex;flex-direction:row;justify-content:space-between;"></div>
+</div>
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/chat.js" asp-append-version="true"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>

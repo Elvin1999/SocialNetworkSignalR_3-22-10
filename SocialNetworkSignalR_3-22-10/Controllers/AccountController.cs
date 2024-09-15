@@ -51,10 +51,10 @@ namespace SocialNetworkSignalR_3_22_10.Controllers
                     Image = model.ImageUrl,
                 };
 
-                IdentityResult result=await _userManager.CreateAsync(user,model.Password);
+                IdentityResult result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    if(!await _roleManager.RoleExistsAsync("Admin"))
+                    if (!await _roleManager.RoleExistsAsync("Admin"))
                     {
                         CustomIdentityRole role = new CustomIdentityRole
                         {
@@ -76,73 +76,48 @@ namespace SocialNetworkSignalR_3_22_10.Controllers
             return View(model);
         }
 
-        // GET: AccountController/Details/5
-        public ActionResult Details(int id)
+        [HttpGet]
+        public ActionResult Login()
         {
             return View();
         }
 
-        // GET: AccountController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: AccountController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
-            try
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, false);
+                if (result.Succeeded)
+                {
+                    var user = _context.Users.SingleOrDefault(u => u.UserName == model.Username);
+                    if (user != null)
+                    {
+                        user.ConnectTime = DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToLongTimeString();
+                        user.IsOnline = true;
+                        _context.Users.Update(user);
+                        await _context.SaveChangesAsync();
+                    }
+                    return RedirectToAction("Index", "Home");
+                }
+                ModelState.AddModelError("", "Invalid Login");
             }
-            catch
-            {
-                return View();
-            }
+            return View(model);
         }
 
-        // GET: AccountController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpGet]
+        public async Task<IActionResult> LogOut()
         {
-            return View();
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            if (user != null)
+            {
+                user.DisConnectTime = DateTime.Now;
+                user.IsOnline = false;
+                await _context.SaveChangesAsync();
+                await _signInManager.SignOutAsync();
+            }
+            return RedirectToAction("Login", "Account");
         }
 
-        // POST: AccountController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: AccountController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: AccountController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
     }
 }
