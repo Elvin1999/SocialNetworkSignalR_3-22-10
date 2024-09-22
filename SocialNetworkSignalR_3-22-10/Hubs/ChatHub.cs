@@ -39,5 +39,10 @@ namespace SocialNetworkSignalR_3_22_10.Hubs
             string info = user.UserName + " diconnected successfully";
             await Clients.Others.SendAsync("Disconnect", info);
         }
+
+        public async Task SendFollow(string id)
+        {
+            await Clients.User(id).SendAsync("ReceiveNotification");
+        }
     }
 }

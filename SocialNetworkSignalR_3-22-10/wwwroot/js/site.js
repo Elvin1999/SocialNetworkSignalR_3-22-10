@@ -49,7 +49,7 @@ function GetAllUsers() {
 }
 
 GetAllUsers();
-
+GetMyRequests();
 
 function SendFollow(id) {
     const element = document.querySelector("#alert");
@@ -60,10 +60,96 @@ function SendFollow(id) {
         success: function (data) {
             element.style.display = "block";
             element.innerHTML = "Your friend request sent successfully";
+            SendFollowCall(id);
+            GetAllUsers();
             setTimeout(() => {
                 element.innerHTML = "";
                 element.style.display = "none";
             }, 5000);
+        }
+    })
+}
+
+function DeclineRequest(id, senderId) {
+    $.ajax({
+        url: `/Home/DeclineRequest?id=${id}&senderId=${senderId}`,
+        method: "GET",
+        success: function (data) {
+            const element = document.querySelector("#alert");
+            element.style.display = "block";
+            element.innerHTML = "You declined request";
+
+            SendFollowCall(senderId);
+            GetMyRequests();
+            GetAllUsers();
+            setTimeout(() => {
+                element.innerHTML = "";
+                element.style.display = "none";
+            },5000)
+        }
+    })
+}
+
+function AcceptRequest(id, id2, requestId) {
+    $.ajax({
+        url: `/Home/AcceptRequest?userId=${id}&senderId=${id2}&requestId=${requestId}`,
+        method: "GET",
+        success: function (data) {
+            const element = document.querySelector("#alert");
+            element.style.display = "block";
+            element.innerHTML = "You accept request successfully";
+            GetAllUsers();
+            SendFollowCall(id);
+            SendFollowCall(id2);
+
+            setTimeout(() => {
+                element.innerHTML = "";
+                element.style.display = "none";
+            }, 5000)
+        }
+    })
+}
+
+function GetMyRequests() {
+    $.ajax({
+        url: '/Home/GetAllRequests',
+        method: "GET",
+        success: function (data) {
+            $("#requests").html("");
+            let content = '';
+            let subContent = '';
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].status == 'Request') {
+                    subContent = `
+                    <div class='card-body'>
+                        <button class='btn btn-success' onclick="AcceptRequest('${data[i].senderId}','${data[i].receiverId}',${data[i].id})">Accept</button>
+                        <button class='btn btn-secondary' onclick="DeclineRequest(${data[i].id},'${data[i].senderId}')">Decline</button>
+                    </div>
+                    `;
+                }
+                else {
+                    subContent = `
+                    <div class='card-body'>
+                        <button class='btn btn-warning'>Delete</button>
+                    </div>
+                    `;
+                }
+
+                let item = `
+                <div class='card' style='width:15rem;'>
+                <div class='card-body'>
+                    <h5> Request </h5>
+                    <ul class='list-group list-group-flush'>
+                    <li>${data[i].content}</li>
+                    </ul>
+                    ${subContent}
+                </div>
+                </div>
+                `;
+
+                content += item;
+            }
+            $("#requests").html(content);
         }
     })
 }
