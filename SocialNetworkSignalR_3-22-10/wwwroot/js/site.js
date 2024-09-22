@@ -12,6 +12,18 @@ function GetAllUsers() {
             let content = "";
             for (var i = 0; i < data.length; i++) {
                 let style = '';
+                let subContent = '';
+                if (data[i].hasRequestPending) {
+                    subContent = `<button class='btn btn-outline-secondary' >Already Sent</button>`
+                }
+                else {
+                    if (data[i].isFriend) {
+                        subContent = `<button class='btn btn-outline-secondary' >UnFollow</button>`
+                    }
+                    else {
+                        subContent = `<button onclick="SendFollow('${data[i].id}')" class='btn btn-outline-primary' >Follow</button>`
+                    }
+                }
                 if (data[i].isOnline) {
                     style = 'border:5px solid springgreen';
                 }
@@ -24,6 +36,7 @@ function GetAllUsers() {
                 <div class='card-body'>
                     <h5 class='card-title'>${data[i].userName}</h5>
                     <p class='card-text'> ${data[i].email} </p>
+                    ${subContent}
                 </div>
                 </div>
                 `;
@@ -36,3 +49,21 @@ function GetAllUsers() {
 }
 
 GetAllUsers();
+
+
+function SendFollow(id) {
+    const element = document.querySelector("#alert");
+    element.style.display = "none";
+    $.ajax({
+        url: `/Home/SendFollow/${id}`,
+        method: "GET",
+        success: function (data) {
+            element.style.display = "block";
+            element.innerHTML = "Your friend request sent successfully";
+            setTimeout(() => {
+                element.innerHTML = "";
+                element.style.display = "none";
+            }, 5000);
+        }
+    })
+}

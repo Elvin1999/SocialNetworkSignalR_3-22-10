@@ -28,5 +28,16 @@ namespace SocialNetworkSignalR_3_22_10.Hubs
             string info = user.UserName + " connected successfully";
             await Clients.Others.SendAsync("Connect", info);
         }
+
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            var user = await _userManager.GetUserAsync(_contextAccessor.HttpContext.User);
+            var userItem = _context.Users.SingleOrDefault(u => u.Id == user.Id);
+            userItem.IsOnline = false;
+            await _context.SaveChangesAsync();
+
+            string info = user.UserName + " diconnected successfully";
+            await Clients.Others.SendAsync("Disconnect", info);
+        }
     }
 }
