@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SocialNetworkSignalR_3_22_10.Data;
 using SocialNetworkSignalR_3_22_10.Entities;
 using SocialNetworkSignalR_3_22_10.Models;
@@ -118,6 +119,8 @@ namespace SocialNetworkSignalR_3_22_10.Controllers
             }
             return RedirectToAction("Login", "Account");
         }
+
+       
 
     }
 }

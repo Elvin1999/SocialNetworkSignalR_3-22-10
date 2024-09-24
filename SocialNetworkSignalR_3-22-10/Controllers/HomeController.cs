@@ -85,6 +85,17 @@ namespace SocialNetworkSignalR_3_22_10.Controllers
             return BadRequest();
         }
 
+        [HttpDelete]
+        public async Task<IActionResult> TakeRequest(string id)
+        {
+            var current = await _userManager.GetUserAsync(HttpContext.User);
+            var request = await _context.FriendRequests.FirstOrDefaultAsync(r => r.SenderId == current.Id && r.ReceiverId == id);
+            if (request == null) return NotFound();
+            _context.FriendRequests.Remove(request);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
         public async Task<IActionResult> GetAllRequests()
         {
             var current = await _userManager.GetUserAsync(HttpContext.User);
@@ -148,6 +159,24 @@ namespace SocialNetworkSignalR_3_22_10.Controllers
             }
             return BadRequest();
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteRequest(int id)
+        {
+            try
+            {
+                var request = await _context.FriendRequests.FirstOrDefaultAsync();
+                if (request == null) return NotFound();
+                _context.FriendRequests.Remove(request);
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         public IActionResult Privacy()
         {
             return View();
@@ -157,6 +186,21 @@ namespace SocialNetworkSignalR_3_22_10.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> UnfollowUser(string id)
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var friend = await _context.Friends.FirstOrDefaultAsync(f => f.YourFriendId == user.Id && f.OwnId == id || f.OwnId == user.Id && f.YourFriendId == id);
+            if (friend != null)
+            {
+                _context.Friends.Remove(friend);
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            return NotFound();
+
         }
     }
 }
