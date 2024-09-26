@@ -53,6 +53,49 @@ function GetAllUsers() {
 GetAllUsers();
 GetMyRequests();
 
+function GetMessages(receiverId, senderId) {
+    $.ajax({
+        url: `/Home/GetAllMessages?receiverId=${receiverId}&senderId=${senderId}`,
+        method: "GET",
+        success: function (data) {
+            let content = "";
+            for (var i = 0; i < data.messages.length; i++) {
+                    let item = `<section    style='display:flex;margin-top:25px;border:2px solid springgreen;
+margin-left:0px;border-radius:0 20px 20px 0;width:50%;padding:20px;'>
+                        <h5>
+                            ${data.messages[i].content}
+                            </h5>
+                            <p>
+                                ${data.messages[i].dateTime}
+                            </p>
+                        </section>`;
+                    content += item;
+            }
+            console.log(data);
+            $("#currentMessages").html(content);
+        }
+    })
+}
+
+function SendMessage(receiverId, senderId) {
+    const content = document.querySelector("#message-input");
+    let obj = {
+        receiverId: receiverId,
+        senderId: senderId,
+        content:content.value
+    };
+
+    $.ajax({
+        url: `/Home/AddMessage`,
+        method: "POST",
+        data:obj,
+        success: function (data) {
+            GetMessageCall(receiverId, senderId);
+            content.value = "";
+        }
+    })
+}
+
 function TakeRequest(id) {
     const element = document.querySelector("#alert");
     element.style.display = "none";

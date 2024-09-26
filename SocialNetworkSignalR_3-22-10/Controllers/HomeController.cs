@@ -85,6 +85,46 @@ namespace SocialNetworkSignalR_3_22_10.Controllers
             return BadRequest();
         }
 
+        [HttpPost(Name = "AddMessage")]
+        public async Task<IActionResult> AddMessage(MessageModel model)
+        {
+            try
+            {
+                var chat = await _context.Chats.FirstOrDefaultAsync(c => c.SenderId == model.SenderId &&
+                c.ReceiverId == model.ReceiverId || c.SenderId == model.ReceiverId && c.ReceiverId == model.SenderId);
+                if (chat != null)
+                {
+                    var message = new Message
+                    {
+                        ChatId = chat.Id,
+                        Content = model.Content,
+                        DateTime = DateTime.Now,
+                        IsImage = false,
+                        HasSeen = false,
+                    };
+                    await _context.Messages.AddAsync(message);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            return Ok();
+        }
+
+        public async Task<IActionResult> GetAllMessages(string receiverId, string senderId)
+        {
+            var chat = await _context.Chats.Include(nameof(Chat.Messages)).FirstOrDefaultAsync(c => c.SenderId == senderId &&
+               c.ReceiverId == receiverId || c.SenderId == receiverId && c.ReceiverId == senderId);
+            if (chat != null)
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                return Ok(new { Messages = chat.Messages, CurrentUserId = user.Id });
+            }
+            return Ok();
+        }
+
         [HttpDelete]
         public async Task<IActionResult> TakeRequest(string id)
         {
@@ -222,7 +262,7 @@ namespace SocialNetworkSignalR_3_22_10.Controllers
 
             var chats = _context.Chats.Include(nameof(Chat.Receiver)).Where(c => c.SenderId == user.Id || c.ReceiverId == user.Id);
 
- 
+
             var chatBlocks = from c in chats
                              let receiver = (user.Id != c.ReceiverId) ? c.Receiver : _context.Users.FirstOrDefault(u => u.Id == c.SenderId)
                              select new Chat
@@ -231,15 +271,16 @@ namespace SocialNetworkSignalR_3_22_10.Controllers
                                  Id = c.Id,
                                  SenderId = c.SenderId,
                                  Receiver = receiver,
-                                 ReceiverId=receiver.Id,
+                                 ReceiverId = receiver.Id,
                              };
 
-            var result=chatBlocks.ToList().Where(c=>c.ReceiverId!=user.Id);
+            var result = chatBlocks.ToList().Where(c => c.ReceiverId != user.Id);
             var model = new ChatViewModel
             {
                 CurrentUserId = user.Id,
+                CurrentReceiver = id,
                 CurrentChat = chat,
-                Chats = result
+                Chats = result.Count() == 0 ? chatBlocks : result,
             };
 
             return View(model);

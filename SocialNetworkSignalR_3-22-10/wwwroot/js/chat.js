@@ -30,6 +30,15 @@ connection.on("Disconnect", function (info) {
     }, 5000);
 })
 
+
+connection.on("ReceiveMessages", function (receiverId, senderId) {
+    GetMessages(receiverId, senderId);
+})
+
+async function GetMessageCall(receiverId, senderId) {
+    alert("Test");
+    await connection.invoke("GetMessages", receiverId, senderId);
+}
 async function SendFollowCall(id) {
     await connection.invoke("SendFollow", id);
 }

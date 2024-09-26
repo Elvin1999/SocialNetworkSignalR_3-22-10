@@ -6,9 +6,14 @@
         <div class="col-md-3">
             @foreach (var item in Model.Chats)
             {
+                var style = "";
+                if (Model.CurrentReceiver == item.ReceiverId)
+                {
+                    style = "background-color:springgreen";
+                }
                 <a href="/Home/GoChat/@item.ReceiverId">
                 <div style="display:flex;cursor:pointer;width:300px;border:2px solid springgreen;
-margin-top:15px;padding:15px;border-radius:15px;">
+margin-top:15px;padding:15px;border-radius:15px;@style">
                 <img style="width:70px;height:70px;" alt="avatar" src="\images\@item.Receiver.Image" />
                 <section style="margin-left:20px;">
                     <h4>@item.Receiver.UserName</h4>
@@ -48,8 +53,8 @@ margin-left:100px;border-radius:20px 0 0 20px;padding:20px;width:50%;">
     </div>
 </div>
 
-<script src="~/js/signalr/dist/browser/signalr.js"></script>
-<script src="~/js/chat.js"></script>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/js/site.js"></script>
-
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/chat.js" asp-append-version="true"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
