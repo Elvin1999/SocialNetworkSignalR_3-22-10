@@ -8,10 +8,10 @@ connection.start().then(function () {
     .catch(function (err) {
         return console.error(err.toString());
     })
-const element = document.querySelector("#alert");
-element.style.display = "none";
+
 connection.on("Connect", function (info) {
     GetAllUsers();
+    const element = document.querySelector("#alert");
     element.style.display = "block";
     element.innerHTML = info;
     setTimeout(() => {
@@ -22,6 +22,7 @@ connection.on("Connect", function (info) {
 
 connection.on("Disconnect", function (info) {
     GetAllUsers();
+    const element = document.querySelector("#alert");
     element.style.display = "block";
     element.innerHTML = info;
     setTimeout(() => {
@@ -36,7 +37,6 @@ connection.on("ReceiveMessages", function (receiverId, senderId) {
 })
 
 async function GetMessageCall(receiverId, senderId) {
-    alert("Test");
     await connection.invoke("GetMessages", receiverId, senderId);
 }
 async function SendFollowCall(id) {

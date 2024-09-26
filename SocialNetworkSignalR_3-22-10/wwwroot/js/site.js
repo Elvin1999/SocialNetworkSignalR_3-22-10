@@ -61,7 +61,7 @@ function GetMessages(receiverId, senderId) {
             let content = "";
             for (var i = 0; i < data.messages.length; i++) {
                     let item = `<section    style='display:flex;margin-top:25px;border:2px solid springgreen;
-margin-left:0px;border-radius:0 20px 20px 0;width:50%;padding:20px;'>
+border-radius:0 20px 20px 0;width:50%;padding:20px;padding-left:0px;'>
                         <h5>
                             ${data.messages[i].content}
                             </h5>
