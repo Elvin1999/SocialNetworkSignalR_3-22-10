@@ -24,7 +24,7 @@
       "launchBrowser": true,
       "applicationUrl": "https://social-network123-crhxf0aceddfgab8.centralindia-01.azurewebsites.net/;https://localhost:7167;http://localhost:5114",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Production"
       }
     },
     "IIS Express": {
