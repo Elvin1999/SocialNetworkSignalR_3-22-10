@@ -12,7 +12,7 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<IImageService, ImageService>();
 
-var conn = builder.Configuration.GetConnectionString("Default");
+var conn = builder.Configuration.GetConnectionString("Production");
 
 builder.Services.AddDbContext<SocialNetworkDbContext>(options =>
 {
