@@ -1,0 +1,60 @@
+﻿@model ChatViewModel
+
+<h1>Your Chat</h1>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            @foreach (var item in Model.Chats)
+            {
+                var style = "";
+                if (Model.CurrentReceiver == item.ReceiverId)
+                {
+                    style = "background-color:lightgray";
+                }
+                <a href="/Home/GoChat/@item.ReceiverId">
+                <div style="display:flex;cursor:pointer;width:300px;border:2px solid springgreen;
+margin-top:15px;padding:15px;border-radius:15px;@style">
+                <img style="width:70px;height:70px;" alt="avatar" src="\images\@item.Receiver.Image" />
+                <section style="margin-left:20px;">
+                    <h4>@item.Receiver.UserName</h4>
+                            @if (item.Receiver.IsOnline)
+                            {
+                                <h5 style="color:springgreen"><b>Online</b></h5>
+                            }
+                            else
+                            {
+                                <h5 style="color:red"><b>Not Available</b></h5>
+                            }
+                        </section>
+                </div>    
+                </a>
+            }
+        </div>
+        <div class="col-md-9">
+            <h1>Click Chat to see chat messages</h1>
+            <div id="currentMessages">
+                @foreach (var message in Model.CurrentChat.Messages)
+                {
+
+                        <section style="display:flex;margin-top:25px;border:2px solid springgreen;
+margin-left:100px;border-radius:20px 0 0 20px;padding:20px;width:50%;">
+                        <h5>@message.Content</h5>
+                        <p>@message.DateTime.ToLongDateString()</p>
+                        <p>@message.DateTime.ToLongTimeString()</p>
+                        </section>
+                  
+                }
+            </div>
+            <section>
+                <input id="message-input" type="text"/>
+                <a class="btn btn-primary" onclick="SendMessage('@Model.CurrentChat.ReceiverId','@Model.CurrentChat.SenderId')">Send Message</a>
+            </section>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/chat.js" asp-append-version="true"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>

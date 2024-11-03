@@ -14,11 +14,13 @@ function GetAllUsers() {
                 let style = '';
                 let subContent = '';
                 if (data[i].hasRequestPending) {
-                    subContent = `<button class='btn btn-outline-secondary' >Already Sent</button>`
+                    subContent = `<button class='btn btn-outline-secondary' onclick="TakeRequest('${data[i].id}')" >Already Sent</button>`
                 }
                 else {
                     if (data[i].isFriend) {
-                        subContent = `<button class='btn btn-outline-secondary' >UnFollow</button>`
+                        subContent = `<button class='btn btn-outline-secondary mr-2' onclick="UnfollowUser('${data[i].id}')" >UnFollow</button>
+                        <a class='btn btn-outline-secondary' href='/Home/GoChat/${data[i].id}' >Send Message</a>
+                        `
                     }
                     else {
                         subContent = `<button onclick="SendFollow('${data[i].id}')" class='btn btn-outline-primary' >Follow</button>`
@@ -50,6 +52,68 @@ function GetAllUsers() {
 
 GetAllUsers();
 GetMyRequests();
+
+function GetMessages(receiverId, senderId) {
+    $.ajax({
+        url: `/Home/GetAllMessages?receiverId=${receiverId}&senderId=${senderId}`,
+        method: "GET",
+        success: function (data) {
+            let content = "";
+            for (var i = 0; i < data.messages.length; i++) {
+                    let item = `<section    style='display:flex;margin-top:25px;border:2px solid springgreen;
+border-radius:0 20px 20px 0;width:50%;padding:20px;padding-left:0px;'>
+                        <h5>
+                            ${data.messages[i].content}
+                            </h5>
+                            <p>
+                                ${data.messages[i].dateTime}
+                            </p>
+                        </section>`;
+                    content += item;
+            }
+            console.log(data);
+            $("#currentMessages").html(content);
+        }
+    })
+}
+
+function SendMessage(receiverId, senderId) {
+    const content = document.querySelector("#message-input");
+    let obj = {
+        receiverId: receiverId,
+        senderId: senderId,
+        content:content.value
+    };
+
+    $.ajax({
+        url: `/Home/AddMessage`,
+        method: "POST",
+        data:obj,
+        success: function (data) {
+            GetMessageCall(receiverId, senderId);
+            content.value = "";
+        }
+    })
+}
+
+function TakeRequest(id) {
+    const element = document.querySelector("#alert");
+    element.style.display = "none";
+    $.ajax({
+        url: `/Home/TakeRequest?id=${id}`,
+        method: "DELETE",
+        success: function (data) {
+            element.style.display = "block";
+            element.innerHTML = "You take your request successfully";
+            SendFollowCall(id);
+            GetAllUsers();
+            setTimeout(() => {
+                element.innerHTML = "";
+                element.style.display = "none";
+            }, 5000);
+        }
+    })
+}
 
 function SendFollow(id) {
     const element = document.querySelector("#alert");
@@ -130,7 +194,7 @@ function GetMyRequests() {
                 else {
                     subContent = `
                     <div class='card-body'>
-                        <button class='btn btn-warning'>Delete</button>
+                        <button class='btn btn-warning' onclick="DeleteRequest(${data[i].id})">Delete</button>
                     </div>
                     `;
                 }
@@ -150,6 +214,28 @@ function GetMyRequests() {
                 content += item;
             }
             $("#requests").html(content);
+        }
+    })
+}
+
+function DeleteRequest(id) {
+    $.ajax({
+        url: `/Home/DeleteRequest/${id}`,
+        method: "DELETE",
+        success: function (data) {
+
+            GetMyRequests();
+        }
+    })
+}
+
+function UnfollowUser(id) {
+    $.ajax({
+        url: `/Home/UnfollowUser?id=${id}`,
+        method: "DELETE",
+        success: function (data) {
+            SendFollowCall(id);
+            GetAllUsers();
         }
     })
 }
